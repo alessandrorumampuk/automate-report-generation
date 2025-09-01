@@ -1,0 +1,100 @@
+name: Daily Git Activity Report
+
+on:
+  schedule:
+    # Run twice daily at 12:00 AM and 12:00 PM UTC
+    - cron: '0 0,12 * * *'
+  # Allow manual triggering with optional date parameter
+  workflow_dispatch:
+    inputs:
+      report_date:
+        description: 'Report date (YYYY-MM-DD format). Leave empty to use yesterday.'
+        required: false
+        type: string
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    # Add permissions for GitHub token
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # Fetch full history for proper git log analysis
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install necessary packages for report generation (removed LaTeX dependencies)
+          pip install numpy requests google-generativeai pyyaml
+          
+          # Install any additional requirements
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: Generate daily activity report
+        run: |
+          # Set report date - use input parameter if provided, otherwise use yesterday
+          if [ -n "${{ github.event.inputs.report_date }}" ]; then
+            REPORT_DATE="${{ github.event.inputs.report_date }}"
+            echo "Using manually specified date: $REPORT_DATE"
+          else
+            REPORT_DATE=$(date -d "yesterday" +%Y-%m-%d)
+            echo "Using yesterday's date: $REPORT_DATE"
+          fi
+          
+          # Create output directory
+          mkdir -p Fleeting/reports/daily
+          
+          # Run the report generation directly (simplified approach)
+          echo "Generating Markdown report for $REPORT_DATE..."
+          python3 .github/scripts/template/codeVault/daily_activity_report.py \
+            --date "$REPORT_DATE" \
+            --output Fleeting/reports/daily
+          
+          # Check if Markdown file was created
+          MD_REPORT="Fleeting/reports/daily/${REPORT_DATE}report.md"
+          
+          if [ -f "$MD_REPORT" ]; then
+            echo "Markdown report generated successfully!"
+            echo "Preview of generated Markdown:"
+            head -n 10 "$MD_REPORT"
+          else
+            echo "Error: Markdown report was not generated."
+            exit 1
+          fi
+      
+      # Commit and push the report back to the repository
+      - name: Commit and push report
+        run: |
+          # Configure git
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Add the generated report files (only Markdown now)
+          git add Fleeting/reports/daily/*.md
+          
+          # Get report date for commit message (same logic as above)
+          if [ -n "${{ github.event.inputs.report_date }}" ]; then
+            REPORT_DATE="${{ github.event.inputs.report_date }}"
+          else
+            REPORT_DATE=$(date -d "yesterday" +%Y-%m-%d)
+          fi
+          
+          # Try to commit 
+          if git commit -m "Add daily git activity report for $REPORT_DATE"; then
+            # Push using the built-in token for authentication
+            git push https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${GITHUB_REF#refs/heads/}
+          else
+            echo "No changes to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
