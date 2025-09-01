@@ -17,16 +17,16 @@
 \definecolor{subheadingcolor}{RGB}{100,149,237}
 \definecolor{textcolor}{RGB}{50,50,50}
 
-% Style for headings
-\titleformat{\section}{\normalsize\bfseries\color{headingcolor}}{\thesection}{0.5em}{}
-\titleformat{\subsection}{\small\bfseries\color{subheadingcolor}}{\thesubsection}{0.5em}{}
-\titleformat{\subsubsection}{\footnotesize\bfseries\color{subheadingcolor}}{\thesubsubsection}{0.5em}{}
+% Style for headings (sections lebih besar)
+\titleformat{\section}{\Large\bfseries\color{headingcolor}}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries\color{subheadingcolor}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{subheadingcolor}}{\thesubsubsection}{0.5em}{}
 
 % Adjust spacing
 \titlespacing*{\section}{0pt}{20pt}{10pt}
 
-% Customize bullet points
-\setlist[itemize]{itemsep=10pt, topsep=6pt, parsep=10pt, partopsep=2pt, leftmargin=*}
+% Customize bullet points (font items lebih besar)
+\setlist[itemize]{itemsep=10pt, topsep=6pt, parsep=10pt, partopsep=2pt, leftmargin=*, label=\textbullet}
 
 % Page style
 \pagestyle{fancy}
@@ -34,19 +34,20 @@
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[C]{\small\thepage}
 
-\title{\vspace{-1.8cm}\textbf{\large{Daily Report - YYYY-MM-DD}}}
-\author{\small{Author Name}}
-\date{\small{YYYY-MM-DD}}
+\title{\vspace{-1cm}\textbf{\LARGE{Daily Report - YYYY-MM-DD}}}
+\author{\normalsize{Author Name}}
+\date{\normalsize{YYYY-MM-DD}}
 
 \begin{document}
 
 \maketitle
-\vspace{0.8cm}
+
+\vspace{1cm}
 
 % Summary Section - Two Columns
 \begin{multicols}{2}
 \section*{Summary}
-\begin{itemize}\small
+\begin{itemize}\normalsize
   \item Key point 1
   \item Key point 2
   \item Key point 3
@@ -58,10 +59,12 @@
   \item Add new key points if needed...
 \end{itemize}
 \end{multicols}
+
+\vspace{1cm}
 
 \begin{multicols}{2}
 \section*{Suggestions}
-\begin{itemize}\small
+\begin{itemize}\normalsize
   \item Key point 1
   \item Key point 2
   \item Key point 3
@@ -73,10 +76,12 @@
   \item Add new key points if needed...
 \end{itemize}
 \end{multicols}
+
+\vspace{1cm}
 
 \begin{multicols}{2}
 \section*{Critique}
-\begin{itemize}\small
+\begin{itemize}\normalsize
   \item Key point 1
   \item Key point 2
   \item Key point 3
@@ -89,8 +94,10 @@
 \end{itemize}
 \end{multicols}
 
-\hfill
+\vspace{1cm}
+
 \section*{Conclusion}
+\normalsize
 Your conclusion goes here. Summarize the key points and provide final thoughts or next steps.
 
 \end{document}
